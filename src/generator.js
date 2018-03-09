@@ -4,9 +4,9 @@ const integrity = require('./integrity');
 
 const chance = new Chance();
 
-exports.generateGeneralData = () => {
+exports.generateGeneralData = (amount) => {
     let items = [];
-    _.times(5000, index => {
+    _.times(amount, index => {
         let string = `${index};201803020912;36;1005;124;22`;
         items.push(`${string}@${integrity.generateChecksum(string)}`);
     });

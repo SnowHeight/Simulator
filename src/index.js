@@ -4,13 +4,13 @@ const _ = require('lodash');
 
 const ITEMS_PER_PACKET = 500;
 
-let port = new SerialPort('COM4', {baudRate: 115200}, function (err) {
+let port = new SerialPort('COM5', {baudRate: 115200}, function (err) {
     if (err) {
         return console.log('Error: ', err.message);
     }
 });
 
-let gdata = generator.generateGeneralData();
+let gdata = generator.generateGeneralData(3000);
 
 let collector = '';
 
@@ -22,7 +22,10 @@ function send(data) {
 function checkForNewCommand() {
     if (collector.indexOf('[settings]') > -1) {
         collector = '';
-        send('[settings]BluetoothName=HC-06;BluetoothCode=1234;UltraSonicInterval=1;LaserInterval=10;Height=150;ServoDrivingTime=100;PowerSaveVoltage=12[/settings]');
+        send('[settings]BluetoothName=HC-06;' +
+            'BluetoothCode=1234;UltraSonicInterval=1;' +
+            'LaserInterval=10;Height=150;ServoDrivingTime=100;' +
+            'PowerSaveVoltage=12[/settings]');
     }
     if (collector.indexOf('[/savesettings]') > -1) {
         collector = '';
