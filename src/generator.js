@@ -1,15 +1,19 @@
 const _ = require('lodash');
 const Chance = require('chance');
 const integrity = require('./integrity');
+const moment = require('moment');
 
 const chance = new Chance();
 
 exports.generateGeneralData = (amount) => {
     let items = [];
+    let date = moment();
     _.times(amount, index => {
-        let string = `${index};201803020912;36;1005;124;22`;
+        date.subtract(10, 'minutes');
+        let string = `${amount - index - 1};${date.format("YYYYMMDDHHmm")};${chance.integer({max: 35, min: -20})};${chance.integer({min: 990, max: 1020})};${chance.integer({min: 115, max: 130})};${chance.integer({min: 10, max: 50})}`;
         items.push(`${string}@${integrity.generateChecksum(string)}`);
     });
+    items.reverse();
     return items;
 };
 

@@ -6,6 +6,7 @@
   "dependencies": {
     "chance": "^1.0.13",
     "lodash": "^4.17.5",
+    "moment": "^2.21.0",
     "serialport": "^6.1.1"
   }
 }

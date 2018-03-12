@@ -1,16 +1,43 @@
 const SerialPort = require('serialport');
 const generator = require('./generator');
+const Chance = require('chance');
 const _ = require('lodash');
 
-const ITEMS_PER_PACKET = 500;
+const chance = new Chance(Math.random());
 
-let port = new SerialPort('COM5', {baudRate: 115200}, function (err) {
-    if (err) {
-        return console.log('Error: ', err.message);
+const ITEMS_PER_PACKET = 500;
+const MAX_ITEMS = 3500;
+const MIN_ITEMS = 2500;
+
+let port;
+
+SerialPort.list().then(devices => {
+    let device = null;
+    if(process.argv[process.argv.length - 1].indexOf('COM') > -1) {
+        device = process.argv[process.argv.length - 1];
+    } else if(devices.length === 1) {
+        console.log('no device specified but exactly one device was found: ' + devices[0].comName);
+        device = devices[0].comName;
+    } else {
+        console.error('no device specified. the following devices were found', devices);
+        process.exit(1);
     }
+    port = new SerialPort(device, {baudRate: 115200}, function (err) {
+        if (err) {
+            return console.log('Error: ', err.message);
+        } else {
+            console.log('connected to the serial port\nthe simulator is running');
+        }
+    });
+
+    port.on('data', function (data) {
+        console.log('rec  < ' + JSON.stringify(data.toString()));
+        collector += data.toString();
+        checkForNewCommand();
+    });
 });
 
-let gdata = generator.generateGeneralData(3000);
+let gdata = generator.generateGeneralData(chance.integer({min: MIN_ITEMS, max: MAX_ITEMS}));
 
 let collector = '';
 
@@ -68,8 +95,9 @@ function checkForNewCommand() {
     }
 }
 
-port.on('data', function (data) {
-    console.log('rec  < ' + JSON.stringify(data.toString()));
-    collector += data.toString();
-    checkForNewCommand();
-});
+setInterval(() => {
+    if(!gdata.length) {
+        console.log('generating new data');
+        gdata = generator.generateGeneralData(chance.integer({min: MIN_ITEMS, max: MAX_ITEMS}));
+    }
+}, 5000);
