@@ -58,6 +58,10 @@ function checkForNewCommand() {
         collector = '';
         send('[savesettings]');
     }
+    if (collector.indexOf('[/setdate]') > -1) {
+        collector = '';
+        send('[setdate]');
+    }
     if (collector.indexOf('[gdata:length]') > -1) {
         collector = '';
         send(`[gdata:length]${gdata.length}[/gdata:length]`);
